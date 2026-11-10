@@ -1,0 +1,40 @@
+{
+  "name": "visualiz0r App",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "remoteUser": "node",
+
+  // Keep node_modules in a named Docker volume: much faster than the macOS bind mount
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // Vite dev (5173), Vite preview (4173), CRA/Next (3000), Storybook (6006)
+  "forwardPorts": [5173, 4173, 3000, 6006],
+  "portsAttributes": {
+    "5173": { "label": "Vite dev server", "onAutoForward": "notify" },
+    "4173": { "label": "Vite preview", "onAutoForward": "silent" },
+    "3000": { "label": "App (3000)", "onAutoForward": "notify" },
+    "6006": { "label": "Storybook", "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oxc.oxc-vscode",
+        "esbenp.prettier-vscode",
+        "vitest.explorer",
+        "ms-playwright.playwright",
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.oxc": "explicit"
+        }
+      }
+    }
+  }
+}
