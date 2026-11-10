@@ -1,37 +1,57 @@
 # visualiz0r
 
-Music visualizer for live performances. Runs full screen on a laptop connected to an LED wall or projector and reacts to the level, spectrum and tempo of an audio input.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Start with
+A music visualizer for live performances. It runs full screen in the browser on a laptop connected to an LED wall or projector, and reacts to the level, spectrum and tempo of any audio input.
 
-    npm run dev -- --host 0.0.0.0
+## Features
 
-Open it via `http://localhost:5173`. Browsers only allow audio capture on `localhost` or `https://`, so opening the dev server through a LAN IP over plain http will not work.
+- Live audio input from a microphone, audio interface or loopback device
+- Real-time level, bass/mid/treble, spectrum and beat analysis, including BPM detection
+- Switchable visuals on number-key hotkeys, drawn on a 2D canvas
+- Full-screen stage mode with an auto-hiding overlay and cursor
+- Keeps the screen awake during a set
+- Small plugin-style API for writing your own visuals
 
-## Using it
+## Getting started
 
-1. Click **Connect audio input** and allow access. Pick the input (microphone, audio interface, loopback device, …) and check the level meter.
-2. Click **Start visualizer**. It goes full screen.
+Requires [Node.js](https://nodejs.org/) 22 or newer.
 
-| Key       | Action                          |
-| --------- | ------------------------------- |
-| `1`–`9`   | Switch visual                   |
-| `F`       | Toggle fullscreen               |
-| `S`       | Back to input selection         |
+```sh
+git clone https://github.com/ef4203/visualiz0r.git
+cd visualiz0r
+npm install
+npm run dev
+```
 
-The on-screen overlay (visual list, detected BPM, input name) fades out after 3 seconds and the cursor hides; move the mouse or press a key to bring it back.
+Open <http://localhost:5173>, connect an audio input and start the visualizer.
+
+> Browsers only allow audio capture on `localhost` or over HTTPS, so serving the dev server over a plain-HTTP LAN address will not work.
 
 ## Adding a visual
 
-1. Create `src/visuals/myVisual.ts` exporting a `Visualization` (see `src/visuals/types.ts` and `eqBars.ts`). `create()` returns an instance whose `draw(ctx, frame, size)` is called every frame with an `AudioFrame`: spectrum, `level`/`bass`/`mid`/`treble`, and `beat` (`onset`, `pulse`, `bpm`).
-2. Append it to the array in `src/visuals/index.ts`. Its position is its hotkey.
+1. Create `src/visuals/myVisual.ts` exporting a `Visualization` (see [`types.ts`](src/visuals/types.ts) and [`eqBars.ts`](src/visuals/eqBars.ts) for a reference). Its `draw(ctx, frame, size)` is called every frame with an `AudioFrame` containing the spectrum, `level`, `bass`, `mid`, `treble` and `beat` data.
+2. Append it to the array in [`src/visuals/index.ts`](src/visuals/index.ts). Its position determines its hotkey.
 
-`bandSpectrum()` in `src/audio/bands.ts` resamples the spectrum into any number of log-spaced bands.
+## Development
 
-## Implement next
+| Command           | Description                        |
+| ----------------- | ---------------------------------- |
+| `npm run dev`     | Start the Vite dev server          |
+| `npm run build`   | Type-check and build to `dist`     |
+| `npm run preview` | Preview the production build       |
+| `npm run lint`    | Lint with [oxlint](https://oxc.rs) |
 
-Ideas for further visuals, aimed at electronic and techno sets. They lean on hard edges and high contrast, where the current visuals are smooth and colourful.
+The project is built with React, TypeScript and Vite, and uses the Web Audio API for analysis. A [devcontainer](.devcontainer) is provided for a ready-to-use environment.
 
-- **Laser Rig.** Thin, sharp beams fan out from a few points on a dark, hazy stage, like a club laser show. The beams sweep slowly with the mids and snap to a new fan angle on every kick. Hi-hats and treble make the finest beams flicker. Section changes (every 8 or 16 beats) switch between fan, cross and parallel patterns. Mostly monochrome with one accent colour, drawn additively so crossings glow.
-- **Ridgeline Waterfall.** Stacked spectrum outlines scroll away from the viewer, one new line per beat or per fixed time step, like the *Unknown Pleasures* cover. Each line is filled black so it hides the lines behind it, giving a rolling mountain range. Bass raises the foreground peaks and the beat pushes the whole stack forward. White lines on black, with only the newest line tinted in the accent colour.
-- **Tile Strobe.** The screen is split into a grid of blocks that flip between black and white in hard cuts, with a pattern that changes per section (rows, checkerboard, diagonals, random clusters). The kick flips big blocks, the snare or clap flips a vertical bar and hi-hats flip single small tiles. Brutalist and minimal, and the sync to the beat is easy to read. Needs a flash-rate cap (around 3 Hz for full-screen flips) or a safe-mode toggle because of photosensitivity at live events.
+## Roadmap
+
+Planned visuals and ideas are tracked in [TODO.md](TODO.md).
+
+## Contributing
+
+Issues and pull requests are welcome. For larger changes, please open an issue first to discuss what you would like to change, and run `npm run lint` and `npm run build` before submitting.
+
+## License
+
+Released under the [MIT License](LICENSE).
