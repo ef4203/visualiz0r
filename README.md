@@ -1,5 +1,6 @@
 # visualiz0r
 
+[![CI](https://github.com/ef4203/visualiz0r/actions/workflows/ci.yml/badge.svg)](https://github.com/ef4203/visualiz0r/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A music visualizer for live performances. It runs full screen in the browser on a laptop connected to an LED wall or projector, and reacts to the level, spectrum and tempo of any audio input.
@@ -15,7 +16,7 @@ A music visualizer for live performances. It runs full screen in the browser on 
 
 ## Getting started
 
-Requires [Node.js](https://nodejs.org/) 22 or newer.
+Requires [Node.js](https://nodejs.org/) 20.19+ or 22.12+ (the minimum supported by Vite 8).
 
 ```sh
 git clone https://github.com/ef4203/visualiz0r.git

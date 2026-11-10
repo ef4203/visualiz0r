@@ -10,13 +10,11 @@
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
-  // Vite dev (5173), Vite preview (4173), CRA/Next (3000), Storybook (6006)
-  "forwardPorts": [5173, 4173, 3000, 6006],
+  // Vite dev (5173), Vite preview (4173)
+  "forwardPorts": [5173, 4173],
   "portsAttributes": {
     "5173": { "label": "Vite dev server", "onAutoForward": "notify" },
-    "4173": { "label": "Vite preview", "onAutoForward": "silent" },
-    "3000": { "label": "App (3000)", "onAutoForward": "notify" },
-    "6006": { "label": "Storybook", "onAutoForward": "silent" }
+    "4173": { "label": "Vite preview", "onAutoForward": "silent" }
   },
 
   "customizations": {
@@ -24,8 +22,7 @@
       "extensions": [
         "oxc.oxc-vscode",
         "esbenp.prettier-vscode",
-        "vitest.explorer",
-        "ms-playwright.playwright",
+        "editorconfig.editorconfig",
         "anthropic.claude-code"
       ],
       "settings": {

@@ -2,7 +2,34 @@
   "name": "visualiz0r",
   "private": true,
   "version": "0.0.0",
+  "description": "A music visualizer for live performances: full-screen, audio-reactive visuals in the browser.",
+  "keywords": [
+    "music-visualizer",
+    "audio-visualizer",
+    "web-audio",
+    "beat-detection",
+    "canvas",
+    "vj",
+    "react",
+    "vite"
+  ],
+  "homepage": "https://github.com/ef4203/visualiz0r#readme",
+  "bugs": {
+    "url": "https://github.com/ef4203/visualiz0r/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ef4203/visualiz0r.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Elias Frank",
+    "url": "https://github.com/ef4203"
+  },
   "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
