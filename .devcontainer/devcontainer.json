@@ -1,6 +1,6 @@
 {
   "name": "visualiz0r App",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:5-26-bookworm",
   "remoteUser": "node",
 
   // Keep node_modules in a named Docker volume: much faster than the macOS bind mount
