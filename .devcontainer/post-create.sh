@@ -7,8 +7,10 @@ cd "$(dirname "$0")/.."
 mkdir -p node_modules
 sudo chown node:node node_modules
 
-# Enables pnpm/yarn shims bundled with Node
-sudo corepack enable
+# Enables pnpm/yarn shims. Node 25+ no longer bundles Corepack, so only run it when present
+if command -v corepack >/dev/null 2>&1; then
+  sudo "$(command -v corepack)" enable
+fi
 
 if [ ! -f package.json ]; then
   echo "No package.json yet - skipping dependency install."

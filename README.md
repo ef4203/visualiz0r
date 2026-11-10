@@ -16,7 +16,7 @@ A music visualizer for live performances. It runs full screen in the browser on 
 
 ## Getting started
 
-Requires [Node.js](https://nodejs.org/) 20.19+ or 22.12+ (the minimum supported by Vite 8).
+Requires [Node.js](https://nodejs.org/) 24 or newer (Node 26 is recommended).
 
 ```sh
 git clone https://github.com/ef4203/visualiz0r.git
