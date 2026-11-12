@@ -2,52 +2,7 @@
 
 ## Tasks
 
-### 1. Laser Rig
-
-**File:** `src/visuals/laserRig.ts`, `id: 'laser-rig'`, `name: 'Laser Rig'`
-
-**Goal:** A club laser show. Thin, sharp beams fan out from a few points on a dark, hazy stage and move in time with the music.
-
-**Look**
-
-- 2–4 emitter points. Each shoots a fan of straight beams that run past the screen edges.
-- Beams are hard-edged and about 1 px thin. Add a wider, very faint pass under them for glow.
-- The haze is a very faint, dark gradient around the emitters. The stage stays close to black.
-- Mostly monochrome: beams in `INK`, with one accent colour (for example from the `blue()` ramp) on a subset of beams or on the haze.
-- Draw additively (`globalCompositeOperation = 'lighter'`) so beam crossings glow.
-
-**Audio mapping**
-
-| Signal              | Effect                                                                                                                                              |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `beat.onset`        | Every fan snaps to a new target angle as a hard cut, not an ease. `beat.strength` scales the size of the snap and `beat.pulse` brightens the beams. |
-| `mid` (smoothed)    | Drives the slow sweep speed of the fans between kicks.                                                                                              |
-| `treble`            | Makes the finest beams flicker. More treble means more flicker.                                                                                     |
-| `level`             | Overall brightness. Near silence the rig fades to almost black.                                                                                     |
-| Every 8 or 16 beats | Section change (see below).                                                                                                                         |
-
-**Sections:** Cycle through three patterns, without repeating the same one twice in a row.
-
-- **Fan:** beams spread out from each emitter.
-- **Cross:** emitters aim at each other so beams cross mid-stage.
-- **Parallel:** all beams share one angle and are evenly spaced.
-
-The pattern change may snap or morph over at most 0.25 s.
-
-**Constraints**
-
-- Keep the total beam count to a few hundred line segments. Batch beams into a few paths (one `stroke()` per alpha level), not one path per beam.
-- No full-screen flashes. Brightness changes come from the beams, not from filling the screen.
-
-**Done when**
-
-- On a steady four-on-the-floor loop the fan angle visibly snaps on every kick and the pattern changes at section boundaries.
-- With silent input the screen is near-black and nothing flickers.
-- With the maximum beam count, `draw()` allocates no arrays or objects.
-
----
-
-### 2. Ridgeline Waterfall
+### 1. Ridgeline Waterfall
 
 **File:** `src/visuals/ridgeline.ts`, `id: 'ridgeline-waterfall'`, `name: 'Ridgeline Waterfall'`
 
@@ -86,7 +41,7 @@ When a line spawns, existing lines glide up by one row pitch using exponential s
 
 ---
 
-### 3. Tile Strobe
+### 2. Tile Strobe
 
 **File:** `src/visuals/tileStrobe.ts`, `id: 'tile-strobe'`, `name: 'Tile Strobe'`
 
