@@ -7,6 +7,9 @@ set -euo pipefail
 IMAGE="mcr.microsoft.com/devcontainers/javascript-node:5-26-bookworm"
 REMOTE_USER="node"
 PORTS=(5173 4173)
+# Override per run, e.g. MEMORY=8g ./apple-container.sh up (only applies when the container is created).
+CPUS="${CPUS:-4}"
+MEMORY="${MEMORY:-4g}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NAME="$(basename "$ROOT")-dev"
@@ -60,6 +63,7 @@ create() {
   for p in "${PORTS[@]}"; do publish+=(-p "$p:$p"); done
 
   container run -d --name "$NAME" -u "$REMOTE_USER" \
+    -c "$CPUS" -m "$MEMORY" \
     --mount "type=bind,source=$ROOT,target=$WORKDIR" \
     -v "$VOLUME:$WORKDIR/node_modules" \
     "${publish[@]}" \

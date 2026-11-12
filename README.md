@@ -47,7 +47,7 @@ The project is built with React, TypeScript and Vite, and uses the Web Audio API
 
 ## Roadmap
 
-Planned visuals and ideas are tracked in [TODO.md](TODO.md).
+Planned ideas are tracked in [TODO.md](TODO.md).
 
 ## Contributing
 
