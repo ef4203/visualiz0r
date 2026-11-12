@@ -3,6 +3,8 @@
 [![CI](https://github.com/ef4203/visualiz0r/actions/workflows/ci.yml/badge.svg)](https://github.com/ef4203/visualiz0r/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+**Live demo: <https://ef4203.github.io/visualiz0r/>**
+
 A music visualizer for live performances. It runs full screen in the browser on a laptop connected to an LED wall or projector, and reacts to the level, spectrum and tempo of any audio input.
 
 ## Features
