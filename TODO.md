@@ -2,46 +2,7 @@
 
 ## Tasks
 
-### 1. Ridgeline Waterfall
-
-**File:** `src/visuals/ridgeline.ts`, `id: 'ridgeline-waterfall'`, `name: 'Ridgeline Waterfall'`
-
-**Goal:** Stacked spectrum outlines scroll away from the viewer like the _Unknown Pleasures_ cover, forming a rolling mountain range.
-
-**Look**
-
-- 30–40 stacked lines. Each is a snapshot of the spectrum from an earlier moment. The newest is at the front (bottom) and older lines sit further back (higher up the screen). Lines may compress and dim slightly towards the back.
-- Each line is a polyline across the width with peaks rising from its own baseline.
-- Draw back to front. For each line, first fill the area under it (down to the bottom of the screen) with `STAGE_BACKGROUND`, then stroke it. That hides the lines behind it.
-- White (`INK`) lines on black. Only the newest line is stroked in the accent colour (for example from the `blue()` ramp).
-- No glow and no gradients. Hard-edged and minimal.
-
-**Audio mapping**
-
-| Signal            | Effect                                                                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `beat.onset`      | Spawns a new line. If more than about 1 s passes without one, spawn anyway so the stack keeps moving in silence or without a detected beat. |
-| Line content      | `bandSpectrum(frame, row, 40, 16000)` with about 96 bands, copied into a preallocated ring buffer when the line spawns.                     |
-| `bass` (smoothed) | Scales the peak height of the foreground lines, fading to no effect towards the back.                                                       |
-| `beat.pulse`      | Pushes the whole stack towards the viewer (shift down and/or scale up slightly) and lets it settle back.                                    |
-
-When a line spawns, existing lines glide up by one row pitch using exponential smoothing, not a jump.
-
-**Constraints**
-
-- Use a fixed-size ring buffer of `Float32Array` rows. No per-frame allocation.
-- Clamp peak height (for example to about 25% of the screen height) so one line can never cover the whole screen.
-- Line width scales with the short screen side and is at least 1 px.
-
-**Done when**
-
-- A nearer line always hides the lines behind it, and no line shows through a fill.
-- New lines appear on beats and the stack glides rather than jumps.
-- Silent input shows flat lines that keep scrolling slowly.
-
----
-
-### 2. Tile Strobe
+### 1. Tile Strobe
 
 **File:** `src/visuals/tileStrobe.ts`, `id: 'tile-strobe'`, `name: 'Tile Strobe'`
 

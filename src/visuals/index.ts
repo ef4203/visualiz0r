@@ -1,6 +1,7 @@
 import { eqBars } from './eqBars.ts'
 import { isoGrid } from './isoGrid.ts'
 import { laserRig } from './laserRig.ts'
+import { ridgeline } from './ridgeline.ts'
 import type { Visualization } from './types.ts'
 import { warpTunnel } from './warpTunnel.ts'
 import { xpPatterns } from './xpPatterns.ts'
@@ -16,4 +17,5 @@ export const visualizations: readonly Visualization[] = [
   isoGrid,
   warpTunnel,
   laserRig,
+  ridgeline,
 ]
