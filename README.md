@@ -40,14 +40,19 @@ See the [docs](docs/README.md) for a [user guide](docs/user-guide.md), [display 
 
 ## Development
 
-| Command           | Description                        |
-| ----------------- | ---------------------------------- |
-| `npm run dev`     | Start the Vite dev server          |
-| `npm run build`   | Type-check and build to `dist`     |
-| `npm run preview` | Preview the production build       |
-| `npm run lint`    | Lint with [oxlint](https://oxc.rs) |
+| Command                    | Description                                                |
+| -------------------------- | ---------------------------------------------------------- |
+| `npm run dev`              | Start the Vite dev server                                  |
+| `npm run build`            | Type-check and build to `dist`                             |
+| `npm run preview`          | Preview the production build                               |
+| `npm run lint`             | Lint with [oxlint](https://oxc.rs)                         |
+| `npm run docs:screenshots` | Regenerate the visual screenshots in `docs/images/visuals` |
 
 The project is built with React, TypeScript and Vite, and uses the Web Audio API for analysis. A [devcontainer](.devcontainer) is provided for a ready-to-use environment.
+
+### Screenshots
+
+The images in the [user guide](docs/user-guide.md#visuals) are generated, not hand-made. Run `npm run docs:screenshots` after adding or changing a visual and commit the updated images. The script starts the app, plays a synthesized demo track into it as a fake microphone, and captures every entry of the visual menu with [Puppeteer](https://pptr.dev). The first run downloads Chrome (about 150 MB) to Puppeteer's cache; set `PUPPETEER_EXECUTABLE_PATH` to use an installed Chrome instead. Images are saved as 1280×720 WebP (about 500 KB for all seven). Run it with `-- --help` for options such as `--only eq-bars`, `--warmup 20`, `--format` and `--quality`.
 
 ## Roadmap
 

@@ -21,15 +21,49 @@ The overlay and cursor hide after 3 seconds. Move the mouse or press a key to br
 
 ## Visuals
 
-| Visual                  | What you see                                        |
-| ----------------------- | --------------------------------------------------- |
-| **EQ Bars**             | Classic spectrum bars rising and falling            |
-| **Psychedelic**         | Swirling feedback-style colour that pulses          |
-| **Cubes**               | A diamond-shaped field of cubes moving with sound   |
-| **Warp Tunnel**         | Rings of geometry rushing towards you               |
-| **Laser Rig**           | Sweeping club-style laser beams                     |
-| **Ridgeline Waterfall** | Stacked spectrum lines scrolling away, one per beat |
-| **Tile Strobe**         | A tile grid that flips on the beat                  |
+The screenshots below are stills from a demo track. They are just a glimpse; the real thing moves with your music.
+
+### EQ Bars
+
+Classic spectrum bars rising and falling.
+
+![EQ Bars](images/visuals/eq-bars.webp)
+
+### Psychedelic
+
+Swirling feedback-style colour that pulses.
+
+![Psychedelic](images/visuals/psychedelic.webp)
+
+### Cubes
+
+A diamond-shaped field of cubes moving with sound.
+
+![Cubes](images/visuals/cubes.webp)
+
+### Warp Tunnel
+
+Rings of geometry rushing towards you.
+
+![Warp Tunnel](images/visuals/warp-tunnel.webp)
+
+### Laser Rig
+
+Sweeping club-style laser beams.
+
+![Laser Rig](images/visuals/laser-rig.webp)
+
+### Ridgeline Waterfall
+
+Stacked spectrum lines scrolling away, one per beat.
+
+![Ridgeline Waterfall](images/visuals/ridgeline-waterfall.webp)
+
+### Tile Strobe
+
+A tile grid that flips on the beat.
+
+![Tile Strobe](images/visuals/tile-strobe.webp)
 
 Tile Strobe has a built-in flash limit (about 3 full-screen flashes per second) to protect photosensitive viewers. It can't be turned off.
 
