@@ -188,8 +188,8 @@ function SetupScreen({ engine, onLaunch }: Props) {
         )}
 
         <p className="setup__keys">
-          While running: <kbd>1</kbd>–<kbd>9</kbd> switch visual · <kbd>F</kbd>{' '}
-          fullscreen · <kbd>S</kbd> back to this screen
+          While running: <kbd>F</kbd> fullscreen · <kbd>S</kbd> back to this
+          screen
         </p>
       </div>
     </main>

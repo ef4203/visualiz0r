@@ -194,30 +194,19 @@ kbd {
   align-items: flex-start;
 }
 
-.hud__visuals {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  color: var(--ink-secondary);
-}
-
-.hud__visuals .is-active {
+.hud__select {
+  pointer-events: none;
+  font: inherit;
   color: var(--ink);
-  font-weight: 600;
+  background: rgb(0 0 0 / 0.55);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 6px 10px;
 }
 
-.hud__tempo {
-  font-size: 20px;
-  color: var(--ink-secondary);
-}
-
-.hud__tempo span {
-  font-size: 40px;
-  font-weight: 600;
-  color: var(--ink);
+.hud--visible .hud__select {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .hud__bottom {

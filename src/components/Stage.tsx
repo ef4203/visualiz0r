@@ -15,9 +15,8 @@ interface Props {
 
 function Stage({ engine, onExit }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const bpmRef = useRef<HTMLSpanElement>(null)
   const hudTimer = useRef(0)
-  const shownBpm = useRef(-1)
+  const selectOpen = useRef(false)
   const [index, setIndex] = useState(0)
   const [hudVisible, setHudVisible] = useState(true)
   const [inputLost, setInputLost] = useState(false)
@@ -28,13 +27,16 @@ function Stage({ engine, onExit }: Props) {
   const showHud = useCallback(() => {
     setHudVisible(true)
     window.clearTimeout(hudTimer.current)
-    hudTimer.current = window.setTimeout(() => setHudVisible(false), HUD_HIDE_MS)
+    hudTimer.current = window.setTimeout(() => {
+      if (selectOpen.current) return
+      setHudVisible(false)
+    }, HUD_HIDE_MS)
   }, [])
 
   useEffect(() => {
-    hudTimer.current = window.setTimeout(() => setHudVisible(false), HUD_HIDE_MS)
+    showHud()
     return () => window.clearTimeout(hudTimer.current)
-  }, [])
+  }, [showHud])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -55,17 +57,10 @@ function Stage({ engine, onExit }: Props) {
     const observer = new ResizeObserver(resize)
     observer.observe(canvas)
 
-    shownBpm.current = -1
     const stopLoop = startFrameLoop((now) => {
       const frame = engine.update(now)
       ctx.setTransform(scale.dpr, 0, 0, scale.dpr, 0, 0)
       instance.draw(ctx, frame, size)
-
-      const bpm = frame.beat.bpm > 0 ? Math.round(frame.beat.bpm) : 0
-      if (bpm !== shownBpm.current) {
-        shownBpm.current = bpm
-        if (bpmRef.current) bpmRef.current.textContent = bpm ? String(bpm) : '--'
-      }
     })
 
     return () => {
@@ -91,13 +86,6 @@ function Stage({ engine, onExit }: Props) {
       if (e.ctrlKey || e.metaKey || e.altKey) return
       showHud()
 
-      // e.code keeps the number row working on layouts where digits need Shift.
-      const digit = /^(?:Digit|Numpad)([1-9])$/.exec(e.code)
-      if (digit) {
-        const next = Number(digit[1]) - 1
-        if (next < visualizations.length) setIndex(next)
-        return
-      }
       if (e.repeat) return
       switch (e.key.toLowerCase()) {
         case 'f':
@@ -122,16 +110,29 @@ function Stage({ engine, onExit }: Props) {
       <canvas ref={canvasRef} className="stage__canvas" />
       <div className={`hud${hud ? ' hud--visible' : ''}`}>
         <div className="hud__top">
-          <ul className="hud__visuals">
+          <select
+            className="hud__select"
+            aria-label="Visual"
+            value={index}
+            onChange={(e) => {
+              setIndex(Number(e.target.value))
+              e.target.blur()
+            }}
+            onFocus={() => {
+              selectOpen.current = true
+              showHud()
+            }}
+            onBlur={() => {
+              selectOpen.current = false
+              showHud()
+            }}
+          >
             {visualizations.map((v, i) => (
-              <li key={v.id} className={i === index ? 'is-active' : undefined}>
-                <kbd>{i + 1}</kbd> {v.name}
-              </li>
+              <option key={v.id} value={i}>
+                {v.name}
+              </option>
             ))}
-          </ul>
-          <div className="hud__tempo">
-            <span ref={bpmRef}>--</span> BPM
-          </div>
+          </select>
         </div>
         <div className="hud__bottom">
           {inputLost && (
@@ -141,8 +142,7 @@ function Stage({ engine, onExit }: Props) {
           )}
           <p>
             {deviceLabel && <>{deviceLabel} · </>}
-            <kbd>1</kbd>–<kbd>9</kbd> visual · <kbd>F</kbd> fullscreen ·{' '}
-            <kbd>S</kbd> change input
+            <kbd>F</kbd> fullscreen · <kbd>S</kbd> change input
           </p>
         </div>
       </div>

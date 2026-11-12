@@ -8,8 +8,8 @@ A music visualizer for live performances. It runs full screen in the browser on 
 ## Features
 
 - Live audio input from a microphone, audio interface or loopback device
-- Real-time level, bass/mid/treble, spectrum and beat analysis, including BPM detection
-- Switchable visuals on number-key hotkeys, drawn on a 2D canvas
+- Real-time level, bass/mid/treble, spectrum and beat analysis
+- Switchable visuals via a drop-down menu that hides with the rest of the overlay, drawn on a 2D canvas
 - Full-screen stage mode with an auto-hiding overlay and cursor
 - Keeps the screen awake during a set
 - Small plugin-style API for writing your own visuals
@@ -32,7 +32,7 @@ Open <http://localhost:5173>, connect an audio input and start the visualizer.
 ## Adding a visual
 
 1. Create `src/visuals/myVisual.ts` exporting a `Visualization` (see [`types.ts`](src/visuals/types.ts) and [`eqBars.ts`](src/visuals/eqBars.ts) for a reference). Its `draw(ctx, frame, size)` is called every frame with an `AudioFrame` containing the spectrum, `level`, `bass`, `mid`, `treble` and `beat` data.
-2. Append it to the array in [`src/visuals/index.ts`](src/visuals/index.ts). Its position determines its hotkey.
+2. Append it to the array in [`src/visuals/index.ts`](src/visuals/index.ts). Its position determines its order in the visual menu.
 
 ## Development
 

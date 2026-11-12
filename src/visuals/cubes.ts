@@ -74,9 +74,9 @@ interface Ripple {
   strength: number
 }
 
-export const isoGrid: Visualization = {
-  id: 'iso-grid',
-  name: 'Iso Grid',
+export const cubes: Visualization = {
+  id: 'cubes',
+  name: 'Cubes',
   create() {
     const half = (GRID - 1) / 2
     const cellCount = GRID * GRID

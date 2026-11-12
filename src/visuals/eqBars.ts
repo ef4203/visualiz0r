@@ -1,5 +1,5 @@
 import { bandSpectrum } from '../audio/bands.ts'
-import { INK, STAGE_BACKGROUND, blue } from './palette.ts'
+import { INK, STAGE_BACKGROUND } from './palette.ts'
 import type { Visualization } from './types.ts'
 
 const BAND_COUNT = 48
@@ -13,6 +13,11 @@ const PEAK_GRAVITY = 2.4
 const UNLIT = 'rgba(255,255,255,0.05)'
 const BASELINE = 'rgba(240,239,236,0.2)'
 const GLOW = '37,106,191'
+/** Row colors, cyan at the bottom through green and yellow to red at the top. */
+const ROW_COLORS: string[] = Array.from({ length: ROWS }, (_, r) => {
+  const hue = 190 - (r / (ROWS - 1)) * 190
+  return `hsl(${hue.toFixed(0)},90%,55%)`
+})
 
 function clamp(x: number, lo: number, hi: number): number {
   return x < lo ? lo : x > hi ? hi : x
@@ -94,12 +99,12 @@ export const eqBars: Visualization = {
           const lit = Math.min(1, level[i] * boost) * ROWS
           const full = Math.floor(lit)
           for (let r = 0; r < full; r++) {
-            ctx.fillStyle = blue((r / (ROWS - 1)) * 0.85 + 0.15 * pulse)
+            ctx.fillStyle = ROW_COLORS[r]
             ctx.fillRect(x, rowTop(r), barW, rowH)
           }
           if (full < ROWS && lit > full) {
             ctx.globalAlpha = lit - full
-            ctx.fillStyle = blue((full / (ROWS - 1)) * 0.85 + 0.15 * pulse)
+            ctx.fillStyle = ROW_COLORS[full]
             ctx.fillRect(x, rowTop(full), barW, rowH)
             ctx.globalAlpha = 1
           }

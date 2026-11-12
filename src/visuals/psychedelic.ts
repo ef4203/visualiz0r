@@ -74,9 +74,9 @@ function tracePath(g: CanvasRenderingContext2D, xs: Float32Array, ys: Float32Arr
   g.lineTo(xs[last], ys[last])
 }
 
-export const xpPatterns: Visualization = {
-  id: 'xp-patterns',
-  name: 'XP Patterns',
+export const psychedelic: Visualization = {
+  id: 'psychedelic',
+  name: 'Psychedelic',
   create() {
     const buffers: [Buffer, Buffer] = [createBuffer(), createBuffer()]
     let current = 0
