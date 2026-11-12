@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AudioEngine } from '../audio/AudioEngine.ts'
 import { startFrameLoop } from '../frameLoop.ts'
 import { keepScreenAwake } from '../keepScreenAwake.ts'
+import { createRenderScaler } from '../renderScale.ts'
 import { visualizations } from '../visuals/index.ts'
 import type { Size } from '../visuals/types.ts'
 
@@ -45,21 +46,38 @@ function Stage({ engine, onExit }: Props) {
 
     const instance = active.create()
     const size: Size = { width: 0, height: 0 }
-    const scale = { dpr: 1 }
+    const scale = { x: 1, y: 1 }
+    const scaler = createRenderScaler()
     const resize = () => {
-      scale.dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1)
+      const dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1) * scaler.scale
       size.width = canvas.clientWidth
       size.height = canvas.clientHeight
-      canvas.width = Math.round(size.width * scale.dpr)
-      canvas.height = Math.round(size.height * scale.dpr)
+      // Resizing clears the canvas, so carry the old pixels over for visuals that accumulate.
+      let old: HTMLCanvasElement | null = null
+      if (canvas.width > 0 && canvas.height > 0) {
+        old = document.createElement('canvas')
+        old.width = canvas.width
+        old.height = canvas.height
+        old.getContext('2d')?.drawImage(canvas, 0, 0)
+      }
+      canvas.width = Math.max(1, Math.round(size.width * dpr))
+      canvas.height = Math.max(1, Math.round(size.height * dpr))
+      // Use the real pixel ratio so rounding never stretches the content.
+      scale.x = size.width > 0 ? canvas.width / size.width : dpr
+      scale.y = size.height > 0 ? canvas.height / size.height : dpr
+      if (old) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0)
+        ctx.drawImage(old, 0, 0, canvas.width, canvas.height)
+      }
     }
     resize()
     const observer = new ResizeObserver(resize)
     observer.observe(canvas)
 
     const stopLoop = startFrameLoop((now) => {
+      if (scaler.update(now) !== null) resize()
       const frame = engine.update(now)
-      ctx.setTransform(scale.dpr, 0, 0, scale.dpr, 0, 0)
+      ctx.setTransform(scale.x, 0, 0, scale.y, 0, 0)
       instance.draw(ctx, frame, size)
     })
 

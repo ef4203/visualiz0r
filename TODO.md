@@ -7,7 +7,6 @@
 - [ ] **Auto-reconnect a lost input.** The engine already knows the last `deviceId`. Retry on `devicechange` and clear the "Audio input lost" alert when it comes back.
 - [ ] **Tap tempo and half/double-time keys.** `BeatDetector.ts` limits tempo to 70-160 BPM, so drum & bass at 174 reads as 87. A manual override is safer than widening the range.
 - [ ] **Beat dot and BPM in the HUD and setup meter.** There is currently no way to see whether beat detection is locked before going live.
-- [ ] **Adaptive render scale.** `MAX_DPR = 2` on a 4K wall renders very large canvases. Lower the render scale automatically when frame time slips, instead of telling users to pick a lighter visual.
 
 ## Medium effort, high value
 
