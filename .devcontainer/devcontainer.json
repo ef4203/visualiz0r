@@ -22,8 +22,7 @@
       "extensions": [
         "oxc.oxc-vscode",
         "esbenp.prettier-vscode",
-        "editorconfig.editorconfig",
-        "anthropic.claude-code"
+        "editorconfig.editorconfig"
       ]
     }
   }
