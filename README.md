@@ -39,6 +39,7 @@ See the [docs](docs/README.md) for a [user guide](docs/user-guide.md), [display 
 
 1. Create `src/visuals/myVisual.ts` exporting a `Visualization` (see [`types.ts`](src/visuals/types.ts) and [`eqBars.ts`](src/visuals/eqBars.ts) for a reference). Its `draw(ctx, frame, size)` is called every frame with an `AudioFrame` containing the spectrum, `level`, `bass`, `mid`, `treble` and `beat` data.
 2. Append it to the array in [`src/visuals/index.ts`](src/visuals/index.ts). Its position determines its order in the visual menu.
+3. Run `npm test`. Every registered visual is picked up automatically and smoke-tested (see [Tests](#tests)).
 
 ## Development
 
@@ -48,9 +49,24 @@ See the [docs](docs/README.md) for a [user guide](docs/user-guide.md), [display 
 | `npm run build`            | Type-check and build to `dist`                             |
 | `npm run preview`          | Preview the production build                               |
 | `npm run lint`             | Lint with [oxlint](https://oxc.rs)                         |
+| `npm test`                 | Run the unit tests with the Node.js test runner            |
 | `npm run docs:screenshots` | Regenerate the visual screenshots in `docs/images/visuals` |
 
 The project is built with React, TypeScript and Vite, and uses the Web Audio API for analysis. A [devcontainer](.devcontainer) is provided for a ready-to-use environment.
+
+### Tests
+
+`npm test` runs the unit tests (`src/**/*.test.ts`) with the built-in [Node.js test runner](https://nodejs.org/api/test.html), so there is nothing extra to install. They run in CI together with lint and build.
+
+[`src/visuals/visuals.test.ts`](src/visuals/visuals.test.ts) tests every entry of the visual registry without a browser. Each visual is driven through simulated audio (silence, music with and without a known tempo, a saturated spectrum) at several canvas sizes, against a recording mock of the 2D context. A visual passes if it:
+
+- creates independent instances and disposes cleanly,
+- paints something and never throws,
+- never passes `NaN`, `Infinity`, negative radii or out-of-range gradient stops to the canvas,
+- balances every `save()` with a `restore()`,
+- leaves the shared `AudioFrame` unmodified.
+
+New visuals are covered automatically once they are added to `src/visuals/index.ts`. The tests check that drawing is safe, not what it looks like, so use `npm run docs:screenshots` or the dev server to check the look.
 
 ### Screenshots
 
@@ -62,7 +78,7 @@ Planned ideas are tracked in [TODO.md](TODO.md).
 
 ## Contributing
 
-Issues and pull requests are welcome. For larger changes, please open an issue first to discuss what you would like to change, and run `npm run lint` and `npm run build` before submitting.
+Issues and pull requests are welcome. For larger changes, please open an issue first to discuss what you would like to change, and run `npm run lint`, `npm test` and `npm run build` before submitting.
 
 ## License
 

@@ -11,7 +11,7 @@
 
 ## Medium effort, high value
 
-- [ ] **Installable offline PWA and a GitHub Pages deploy.** The docs require `npm run dev` at the gig. The app is a static SPA and HTTPS satisfies the microphone requirement, so a manifest and a small service worker would let someone open an app icon with no internet and no terminal.
+- [ ] **Installable offline PWA.** The docs require `npm run dev` at the gig. The app is a static SPA and HTTPS satisfies the microphone requirement, so a manifest and a small service worker would let someone open an app icon with no internet and no terminal.
 - [ ] **Tab/system audio capture** via `getDisplayMedia({ audio: true })`. Covers "music on the same laptop" without installing BlackHole or VB-Cable, at least for browser-based players.
 - [ ] **Demo audio source** on the setup screen, to try the visuals without hardware and as a deterministic input for testing.
 - [ ] **Place the stage on the external display directly** with the Window Management API (Chromium). Removes the "drag the window first, then press F" step that the display-setups and troubleshooting docs spend a lot of space on.
@@ -25,7 +25,7 @@
 ## Bugs and gaps
 
 - [ ] **Setup screen after an input loss.** `SetupScreen.tsx` only refreshes the device list `if (engine.active)`. After a loss and `S`, the user gets a lone "Connect audio input" button instead of the device picker, and the "disconnected" message never shows because Stage was mounted when it fired. This contradicts the user guide ("press S and pick it again").
-- [ ] **Tests.** There are none and CI only runs lint and build. Add Vitest and cover `estimateTempo` with synthetic click tracks, then run it in CI.
+- [ ] **Tests for the audio core.** `npm test` (Node's built-in runner) smoke-tests every visual, but nothing covers `src/audio/`. Add tests for `estimateTempo` with synthetic click tracks, `bandSpectrum` and `SpectrumProcessor`.
 - [ ] **Developer docs.** `docs/README.md` has no developer section. Document the conventions for visuals: no allocations in `draw`, use `beat.bpm` when known, use the shared palette.
 
 ## Out of scope (to keep the app small)
