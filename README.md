@@ -29,6 +29,10 @@ Open <http://localhost:5173>, connect an audio input and start the visualizer.
 
 > Browsers only allow audio capture on `localhost` or over HTTPS, so serving the dev server over a plain-HTTP LAN address will not work.
 
+## Documentation
+
+See the [docs](docs/README.md) for a [user guide](docs/user-guide.md), [display setups](docs/display-setups.md) (laptop to projector, monitor or LED wall on macOS and Windows) and [troubleshooting](docs/troubleshooting.md).
+
 ## Adding a visual
 
 1. Create `src/visuals/myVisual.ts` exporting a `Visualization` (see [`types.ts`](src/visuals/types.ts) and [`eqBars.ts`](src/visuals/eqBars.ts) for a reference). Its `draw(ctx, frame, size)` is called every frame with an `AudioFrame` containing the spectrum, `level`, `bass`, `mid`, `treble` and `beat` data.
