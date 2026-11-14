@@ -2,7 +2,6 @@
 
 ## Small changes, biggest live payoff
 
-- [ ] **Hotkeys for visuals.** `Stage.tsx` only handles `F` and `S`. Add `1`-`7` and `←/→` to switch visuals, `B` for blackout (a dark overlay div) and `-`/`+` for master brightness (LED walls are very bright up close).
 - [ ] **Remember settings.** The visual resets to EQ Bars on every start and only the input device is saved. Persist the last visual and brightness in `localStorage`.
 - [ ] **Auto-reconnect a lost input.** The engine already knows the last `deviceId`. Retry on `devicechange` and clear the "Audio input lost" alert when it comes back.
 - [ ] **Tap tempo and half/double-time keys.** `BeatDetector.ts` limits tempo to 70-160 BPM, so drum & bass at 174 reads as 87. A manual override is safer than widening the range.
@@ -16,10 +15,6 @@
 - [ ] **Place the stage on the external display directly** with the Window Management API (Chromium). Removes the "drag the window first, then press F" step that the display-setups and troubleshooting docs spend a lot of space on.
 - [ ] **Auto-cycle mode.** An "Auto" entry in the visual menu that switches every N bars with a dip-to-black transition. The same transition also softens manual switches.
 - [ ] **Shared bar/phase clock in `BeatState`.** A tempo-locked `phase` and `bar` would replace each visual counting onsets itself (`tileStrobe.ts`, `psychedelic.ts`) and keep pulses in time through missed onsets. Touches the audio core, so higher risk.
-
-## Bigger bet
-
-- [ ] **Pop-out control window** for the laptop screen, linked with `BroadcastChannel`: visual list, blackout, brightness, BPM. The audience display currently shows the drop-down and device label whenever the mouse moves, and hotkeys do not fire when DJ software has focus. Do this only if hotkeys turn out not to be enough.
 
 ## Bugs and gaps
 

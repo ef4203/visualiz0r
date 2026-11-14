@@ -14,6 +14,9 @@ Echo cancellation, noise suppression and auto gain are switched off, so your mus
 | Key / control | Action                  |
 | ------------- | ----------------------- |
 | Drop-down     | Switch visual           |
+| **←** / **→** | Previous / next visual  |
+| **B**         | Toggle blackout         |
+| **-** / **+** | Master brightness       |
 | **F**         | Toggle full screen      |
 | **S**         | Back to input selection |
 

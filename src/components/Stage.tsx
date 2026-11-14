@@ -8,6 +8,8 @@ import type { Size } from '../visuals/types.ts'
 
 const HUD_HIDE_MS = 3000
 const MAX_DPR = 2
+const BRIGHTNESS_STEP = 0.1
+const MIN_BRIGHTNESS = 0.1
 
 interface Props {
   engine: AudioEngine
@@ -20,6 +22,8 @@ function Stage({ engine, onExit }: Props) {
   const selectOpen = useRef(false)
   const [index, setIndex] = useState(0)
   const [hudVisible, setHudVisible] = useState(true)
+  const [blackout, setBlackout] = useState(false)
+  const [brightness, setBrightness] = useState(1)
   const [inputLost, setInputLost] = useState(false)
   const [deviceLabel] = useState(() => engine.deviceLabel)
 
@@ -104,8 +108,35 @@ function Stage({ engine, onExit }: Props) {
       if (e.ctrlKey || e.metaKey || e.altKey) return
       showHud()
 
+      const step = (delta: number) =>
+        setBrightness((b) =>
+          Math.min(1, Math.max(MIN_BRIGHTNESS, Math.round((b + delta) * 10) / 10)),
+        )
+      const inSelect = e.target instanceof HTMLSelectElement
+
+      switch (e.key.toLowerCase()) {
+        case '-':
+          step(-BRIGHTNESS_STEP)
+          return
+        case '+':
+        case '=':
+          step(BRIGHTNESS_STEP)
+          return
+        case 'arrowleft':
+        case 'arrowright':
+          // A focused drop-down already handles arrows itself.
+          if (inSelect) return
+          e.preventDefault()
+          if (e.repeat) return
+          setIndex((i) => (i + (e.key === 'ArrowRight' ? 1 : -1) + visualizations.length) % visualizations.length)
+          return
+      }
+
       if (e.repeat) return
       switch (e.key.toLowerCase()) {
+        case 'b':
+          setBlackout((on) => !on)
+          break
         case 'f':
           if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
           else document.documentElement.requestFullscreen().catch(() => {})
@@ -126,6 +157,11 @@ function Stage({ engine, onExit }: Props) {
   return (
     <div className={`stage${hud ? '' : ' stage--idle'}`} onMouseMove={showHud}>
       <canvas ref={canvasRef} className="stage__canvas" />
+      <div
+        className="stage__dim"
+        style={{ opacity: blackout ? 1 : 1 - brightness }}
+        aria-hidden="true"
+      />
       <div className={`hud${hud ? ' hud--visible' : ''}`}>
         <div className="hud__top">
           <select
@@ -160,7 +196,10 @@ function Stage({ engine, onExit }: Props) {
           )}
           <p>
             {deviceLabel && <>{deviceLabel} · </>}
-            <kbd>F</kbd> fullscreen · <kbd>S</kbd> change input
+            <kbd>←</kbd>
+            <kbd>→</kbd> switch visual · <kbd>B</kbd> blackout{blackout && ' (on)'} · <kbd>-</kbd>
+            <kbd>+</kbd> brightness {Math.round(brightness * 100)}% · <kbd>F</kbd> fullscreen ·{' '}
+            <kbd>S</kbd> change input
           </p>
         </div>
       </div>

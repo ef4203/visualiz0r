@@ -169,6 +169,13 @@ kbd {
   height: 100%;
 }
 
+.stage__dim {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  pointer-events: none;
+}
+
 .hud {
   position: absolute;
   inset: 0;
