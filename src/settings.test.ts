@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import {
   MAX_BRIGHTNESS,
   MIN_BRIGHTNESS,
+  MIN_RESTORED_BRIGHTNESS,
   clampBrightness,
   loadBrightness,
   loadInputDevice,
@@ -58,20 +59,26 @@ test('falls back to the first visual when the saved one no longer exists', () =>
 
 test('round-trips brightness', () => {
   const s = memoryStorage()
-  saveBrightness(0.4, s)
-  assert.equal(loadBrightness(s), 0.4)
+  saveBrightness(0.7, s)
+  assert.equal(loadBrightness(s), 0.7)
+})
+
+test('restores a low brightness no darker than the floor', () => {
+  const s = memoryStorage()
+  saveBrightness(0.2, s)
+  assert.equal(loadBrightness(s), MIN_RESTORED_BRIGHTNESS)
 })
 
 test('sanitizes stored brightness', () => {
   const s = memoryStorage()
   for (const [raw, expected] of [
-    ['0', MIN_BRIGHTNESS],
-    ['-3', MIN_BRIGHTNESS],
+    ['0', MIN_RESTORED_BRIGHTNESS],
+    ['-3', MIN_RESTORED_BRIGHTNESS],
     ['7', MAX_BRIGHTNESS],
     ['NaN', MAX_BRIGHTNESS],
     ['abc', MAX_BRIGHTNESS],
     ['', MAX_BRIGHTNESS],
-    ['0.34', 0.3],
+    ['0.64', 0.6],
   ] as const) {
     s.data.set('visualiz0r.brightness', raw)
     assert.equal(loadBrightness(s), expected, `stored ${JSON.stringify(raw)}`)
@@ -80,6 +87,7 @@ test('sanitizes stored brightness', () => {
 
 test('clampBrightness rounds to 10% steps within range', () => {
   assert.equal(clampBrightness(0.7 + 0.1), 0.8)
+  assert.equal(clampBrightness(0.2 + 0.1), 0.3)
   assert.equal(clampBrightness(0.05), MIN_BRIGHTNESS)
   assert.equal(clampBrightness(1.2), MAX_BRIGHTNESS)
   assert.equal(clampBrightness(Infinity), MAX_BRIGHTNESS)

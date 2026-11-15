@@ -4,6 +4,7 @@ import { startFrameLoop } from '../frameLoop.ts'
 import { keepScreenAwake } from '../keepScreenAwake.ts'
 import { createRenderScaler } from '../renderScale.ts'
 import {
+  BRIGHTNESS_STEP,
   clampBrightness,
   loadBrightness,
   loadVisualIndex,
@@ -15,7 +16,7 @@ import type { Size } from '../visuals/types.ts'
 
 const HUD_HIDE_MS = 3000
 const MAX_DPR = 2
-const BRIGHTNESS_STEP = 0.1
+const BRIGHTNESS_SAVE_DELAY_MS = 300
 
 interface Props {
   engine: AudioEngine
@@ -26,6 +27,12 @@ function Stage({ engine, onExit }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hudTimer = useRef(0)
   const selectOpen = useRef(false)
+  // Settings are saved only after the user changes them, so a restored fallback never
+  // overwrites what is stored.
+  const visualChosen = useRef(false)
+  const brightnessChanged = useRef(false)
+  const pendingBrightness = useRef<number | null>(null)
+  const brightnessTimer = useRef(0)
   const [index, setIndex] = useState(() => loadVisualIndex(visualizations.map((v) => v.id)))
   const [hudVisible, setHudVisible] = useState(true)
   const [blackout, setBlackout] = useState(false)
@@ -35,8 +42,34 @@ function Stage({ engine, onExit }: Props) {
 
   const active = visualizations[index]
 
-  useEffect(() => saveVisual(active.id), [active.id])
-  useEffect(() => saveBrightness(brightness), [brightness])
+  const chooseVisual = useCallback((next: (i: number) => number) => {
+    visualChosen.current = true
+    setIndex(next)
+  }, [])
+
+  // Debounced, since holding +/- auto-repeats and storage writes are synchronous.
+  useEffect(() => {
+    if (!brightnessChanged.current) return
+    pendingBrightness.current = brightness
+    window.clearTimeout(brightnessTimer.current)
+    brightnessTimer.current = window.setTimeout(() => {
+      if (pendingBrightness.current !== null) saveBrightness(pendingBrightness.current)
+      pendingBrightness.current = null
+    }, BRIGHTNESS_SAVE_DELAY_MS)
+  }, [brightness])
+
+  useEffect(() => {
+    const flush = () => {
+      window.clearTimeout(brightnessTimer.current)
+      if (pendingBrightness.current !== null) saveBrightness(pendingBrightness.current)
+      pendingBrightness.current = null
+    }
+    window.addEventListener('pagehide', flush)
+    return () => {
+      window.removeEventListener('pagehide', flush)
+      flush()
+    }
+  }, [])
 
   const showHud = useCallback(() => {
     setHudVisible(true)
@@ -87,11 +120,17 @@ function Stage({ engine, onExit }: Props) {
     const observer = new ResizeObserver(resize)
     observer.observe(canvas)
 
+    let drawn = false
     const stopLoop = startFrameLoop((now) => {
       if (scaler.update(now) !== null) resize()
       const frame = engine.update(now)
       ctx.setTransform(scale.x, 0, 0, scale.y, 0, 0)
       instance.draw(ctx, frame, size)
+      // Remember a chosen visual only once it has drawn, so one that throws is never restored.
+      if (!drawn) {
+        drawn = true
+        if (visualChosen.current) saveVisual(active.id)
+      }
     })
 
     return () => {
@@ -117,7 +156,10 @@ function Stage({ engine, onExit }: Props) {
       if (e.ctrlKey || e.metaKey || e.altKey) return
       showHud()
 
-      const step = (delta: number) => setBrightness((b) => clampBrightness(b + delta))
+      const step = (delta: number) => {
+        brightnessChanged.current = true
+        setBrightness((b) => clampBrightness(b + delta))
+      }
       const inSelect = e.target instanceof HTMLSelectElement
 
       switch (e.key.toLowerCase()) {
@@ -134,7 +176,9 @@ function Stage({ engine, onExit }: Props) {
           if (inSelect) return
           e.preventDefault()
           if (e.repeat) return
-          setIndex((i) => (i + (e.key === 'ArrowRight' ? 1 : -1) + visualizations.length) % visualizations.length)
+          chooseVisual(
+            (i) => (i + (e.key === 'ArrowRight' ? 1 : -1) + visualizations.length) % visualizations.length,
+          )
           return
       }
 
@@ -154,7 +198,7 @@ function Stage({ engine, onExit }: Props) {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [onExit, showHud])
+  }, [onExit, showHud, chooseVisual])
 
   useEffect(() => keepScreenAwake(), [])
 
@@ -175,7 +219,8 @@ function Stage({ engine, onExit }: Props) {
             aria-label="Visual"
             value={index}
             onChange={(e) => {
-              setIndex(Number(e.target.value))
+              const next = Number(e.target.value)
+              chooseVisual(() => next)
               e.target.blur()
             }}
             onFocus={() => {

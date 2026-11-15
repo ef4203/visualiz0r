@@ -1,9 +1,13 @@
 // Settings persisted in localStorage so a restart picks up where the last show left off.
 // Storage can be missing or throw (private mode, blocked site data), so every access is
-// guarded and falls back to the defaults.
+// guarded and falls back to the defaults. Several windows on one origin share these keys;
+// the last write wins.
 
 export const MIN_BRIGHTNESS = 0.1
 export const MAX_BRIGHTNESS = 1
+export const BRIGHTNESS_STEP = 0.1
+/** A show that ended dimmed should not start the next one nearly black. */
+export const MIN_RESTORED_BRIGHTNESS = 0.5
 
 const KEYS = {
   inputDevice: 'visualiz0r.inputDevice',
@@ -39,10 +43,12 @@ function write(key: Key, value: string, storage: SettingsStorage | null): void {
   }
 }
 
-/** Clamps to the allowed range and rounds to 10% steps. Non-finite values become full brightness. */
+/** Clamps to the allowed range and rounds to `BRIGHTNESS_STEP`. Non-finite values become full brightness. */
 export function clampBrightness(value: number): number {
   if (!Number.isFinite(value)) return MAX_BRIGHTNESS
-  const rounded = Math.round(value * 10) / 10
+  const steps = Math.round(value / BRIGHTNESS_STEP)
+  // Divide by the inverse so 0.1 steps come out as 0.3, not 0.30000000000000004.
+  const rounded = steps / (1 / BRIGHTNESS_STEP)
   return Math.min(MAX_BRIGHTNESS, Math.max(MIN_BRIGHTNESS, rounded))
 }
 
@@ -68,7 +74,7 @@ export function saveVisual(id: string, storage = defaultStorage()): void {
 export function loadBrightness(storage = defaultStorage()): number {
   const raw = read('brightness', storage)
   if (raw === null || raw.trim() === '') return MAX_BRIGHTNESS
-  return clampBrightness(Number(raw))
+  return Math.max(MIN_RESTORED_BRIGHTNESS, clampBrightness(Number(raw)))
 }
 
 export function saveBrightness(value: number, storage = defaultStorage()): void {
