@@ -27,10 +27,11 @@ Per animation frame (one-way): `Stage` rAF loop (`frameLoop.ts`) calls `engine.u
 - **Canvas context is pre-scaled** for `devicePixelRatio` (`MAX_DPR = 2` in `Stage.tsx`); `size` is CSS pixels, so draw in CSS pixels.
 - **Audio input is deliberately raw:** `getUserMedia` with echo cancellation, noise suppression and AGC off; the analyser is not connected to `ctx.destination` (would feed the mic back through speakers). Keep both when touching `AudioEngine.start`.
 - **Async start is guarded by `startToken`:** a newer `start()`/`stop()` invalidates an in-flight one, which releases its stream. Preserve this when adding awaits.
+- **Persisted settings** (input device, visual id, brightness) go through `src/settings.ts`, which guards every `localStorage` access and validates what it reads. Add new persisted settings there.
 - **Input loss** goes through `engine.subscribeEnded`; `Stage` shows the "Audio input lost" alert.
 - **`BeatDetector` tempo is clamped to 70-160 BPM** (`MIN_BPM`/`MAX_BPM`), so faster music reads at half tempo (known limitation in `TODO.md`).
 
-`TODO.md` is the roadmap and known bugs: planned hotkeys, persisted settings, PWA, audio-core tests; out of scope: per-visual settings UI, plugin loader UI, WebGL rewrite, video export, MIDI. Check it before proposing features.
+`TODO.md` is the roadmap and known bugs: planned auto-reconnect, tap tempo, PWA, audio-core tests; out of scope: per-visual settings UI, plugin loader UI, WebGL rewrite, video export, MIDI. Check it before proposing features.
 
 ## Docs and screenshots
 

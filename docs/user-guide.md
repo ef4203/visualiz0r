@@ -3,7 +3,7 @@
 ## Start
 
 1. Run the app (see the [README](../README.md#getting-started)) and open <http://localhost:5173>. Use `localhost`; browsers block audio capture on plain-HTTP network addresses.
-2. Click **Connect audio input** and allow microphone access. The app remembers your last device.
+2. Click **Connect audio input** and allow microphone access. The app remembers your last device, visual and brightness.
 3. Pick your input from the **Audio input** drop-down. The **Input level** meter should move.
 4. Click **Start visualizer** (or press **Enter**). The app requests full screen on whichever display the window is on.
 
@@ -19,6 +19,8 @@ Echo cancellation, noise suppression and auto gain are switched off, so your mus
 | **-** / **+** | Master brightness       |
 | **F**         | Toggle full screen      |
 | **S**         | Back to input selection |
+
+The selected visual and brightness are saved in the browser and restored on the next start. Blackout always starts off.
 
 The overlay and cursor hide after 3 seconds. Move the mouse or press a key to bring them back. The screen is kept awake while the visualizer runs.
 
