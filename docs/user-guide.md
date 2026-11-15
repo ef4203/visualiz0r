@@ -20,7 +20,7 @@ Echo cancellation, noise suppression and auto gain are switched off, so your mus
 | **F**         | Toggle full screen      |
 | **S**         | Back to input selection |
 
-The selected visual and brightness are saved in the browser and restored on the next start. Brightness comes back at 50% or more, and blackout always starts off.
+The selected visual and brightness are saved in the browser and restored on the next start. Blackout always starts off.
 
 The overlay and cursor hide after 3 seconds. Move the mouse or press a key to bring them back. The screen is kept awake while the visualizer runs.
 

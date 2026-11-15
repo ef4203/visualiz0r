@@ -3,7 +3,6 @@ import { test } from 'node:test'
 import {
   MAX_BRIGHTNESS,
   MIN_BRIGHTNESS,
-  MIN_RESTORED_BRIGHTNESS,
   clampBrightness,
   loadBrightness,
   loadInputDevice,
@@ -63,17 +62,17 @@ test('round-trips brightness', () => {
   assert.equal(loadBrightness(s), 0.7)
 })
 
-test('restores a low brightness no darker than the floor', () => {
+test('restores the exact brightness, even at the minimum', () => {
   const s = memoryStorage()
-  saveBrightness(0.2, s)
-  assert.equal(loadBrightness(s), MIN_RESTORED_BRIGHTNESS)
+  saveBrightness(MIN_BRIGHTNESS, s)
+  assert.equal(loadBrightness(s), MIN_BRIGHTNESS)
 })
 
 test('sanitizes stored brightness', () => {
   const s = memoryStorage()
   for (const [raw, expected] of [
-    ['0', MIN_RESTORED_BRIGHTNESS],
-    ['-3', MIN_RESTORED_BRIGHTNESS],
+    ['0', MIN_BRIGHTNESS],
+    ['-3', MIN_BRIGHTNESS],
     ['7', MAX_BRIGHTNESS],
     ['NaN', MAX_BRIGHTNESS],
     ['abc', MAX_BRIGHTNESS],

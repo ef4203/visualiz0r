@@ -6,8 +6,6 @@
 export const MIN_BRIGHTNESS = 0.1
 export const MAX_BRIGHTNESS = 1
 export const BRIGHTNESS_STEP = 0.1
-/** A show that ended dimmed should not start the next one nearly black. */
-export const MIN_RESTORED_BRIGHTNESS = 0.5
 
 const KEYS = {
   inputDevice: 'visualiz0r.inputDevice',
@@ -74,7 +72,7 @@ export function saveVisual(id: string, storage = defaultStorage()): void {
 export function loadBrightness(storage = defaultStorage()): number {
   const raw = read('brightness', storage)
   if (raw === null || raw.trim() === '') return MAX_BRIGHTNESS
-  return Math.max(MIN_RESTORED_BRIGHTNESS, clampBrightness(Number(raw)))
+  return clampBrightness(Number(raw))
 }
 
 export function saveBrightness(value: number, storage = defaultStorage()): void {
