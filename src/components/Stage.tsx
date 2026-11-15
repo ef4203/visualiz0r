@@ -3,13 +3,19 @@ import type { AudioEngine } from '../audio/AudioEngine.ts'
 import { startFrameLoop } from '../frameLoop.ts'
 import { keepScreenAwake } from '../keepScreenAwake.ts'
 import { createRenderScaler } from '../renderScale.ts'
+import {
+  clampBrightness,
+  loadBrightness,
+  loadVisualIndex,
+  saveBrightness,
+  saveVisual,
+} from '../settings.ts'
 import { visualizations } from '../visuals/index.ts'
 import type { Size } from '../visuals/types.ts'
 
 const HUD_HIDE_MS = 3000
 const MAX_DPR = 2
 const BRIGHTNESS_STEP = 0.1
-const MIN_BRIGHTNESS = 0.1
 
 interface Props {
   engine: AudioEngine
@@ -20,14 +26,17 @@ function Stage({ engine, onExit }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hudTimer = useRef(0)
   const selectOpen = useRef(false)
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(() => loadVisualIndex(visualizations.map((v) => v.id)))
   const [hudVisible, setHudVisible] = useState(true)
   const [blackout, setBlackout] = useState(false)
-  const [brightness, setBrightness] = useState(1)
+  const [brightness, setBrightness] = useState(loadBrightness)
   const [inputLost, setInputLost] = useState(false)
   const [deviceLabel] = useState(() => engine.deviceLabel)
 
   const active = visualizations[index]
+
+  useEffect(() => saveVisual(active.id), [active.id])
+  useEffect(() => saveBrightness(brightness), [brightness])
 
   const showHud = useCallback(() => {
     setHudVisible(true)
@@ -108,10 +117,7 @@ function Stage({ engine, onExit }: Props) {
       if (e.ctrlKey || e.metaKey || e.altKey) return
       showHud()
 
-      const step = (delta: number) =>
-        setBrightness((b) =>
-          Math.min(1, Math.max(MIN_BRIGHTNESS, Math.round((b + delta) * 10) / 10)),
-        )
+      const step = (delta: number) => setBrightness((b) => clampBrightness(b + delta))
       const inSelect = e.target instanceof HTMLSelectElement
 
       switch (e.key.toLowerCase()) {

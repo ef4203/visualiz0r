@@ -2,7 +2,6 @@
 
 ## Small changes, biggest live payoff
 
-- [ ] **Remember settings.** The visual resets to EQ Bars on every start and only the input device is saved. Persist the last visual and brightness in `localStorage`.
 - [ ] **Auto-reconnect a lost input.** The engine already knows the last `deviceId`. Retry on `devicechange` and clear the "Audio input lost" alert when it comes back.
 - [ ] **Tap tempo and half/double-time keys.** `BeatDetector.ts` limits tempo to 70-160 BPM, so drum & bass at 174 reads as 87. A manual override is safer than widening the range.
 - [ ] **Beat dot and BPM in the HUD and setup meter.** There is currently no way to see whether beat detection is locked before going live.

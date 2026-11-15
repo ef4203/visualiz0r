@@ -5,8 +5,7 @@ import {
   type AudioInputDevice,
 } from '../audio/AudioEngine.ts'
 import { startFrameLoop } from '../frameLoop.ts'
-
-const STORAGE_KEY = 'visualiz0r.inputDevice'
+import { loadInputDevice, saveInputDevice } from '../settings.ts'
 
 type Status = 'idle' | 'connecting' | 'ready'
 
@@ -91,7 +90,7 @@ function SetupScreen({ engine, onLaunch }: Props) {
       if (!engine.active) return
       const actual = engine.deviceId ?? ''
       setDeviceId(actual)
-      if (actual) localStorage.setItem(STORAGE_KEY, actual)
+      saveInputDevice(actual)
       setDevices(await listAudioInputs())
       setStatus('ready')
     } catch (e) {
@@ -121,7 +120,7 @@ function SetupScreen({ engine, onLaunch }: Props) {
             type="button"
             className="button button--primary"
             disabled={status === 'connecting'}
-            onClick={() => open(localStorage.getItem(STORAGE_KEY) ?? undefined)}
+            onClick={() => open(loadInputDevice())}
           >
             {status === 'connecting' ? 'Connecting…' : 'Connect audio input'}
           </button>
