@@ -44,7 +44,7 @@ function SetupScreen({ engine, onLaunch }: Props) {
     const refresh = () => {
       listAudioInputs().then(setDevices, () => {})
     }
-    if (engine.active) refresh()
+    if (engine.hadInput) refresh()
 
     const unsubscribe = engine.subscribeEnded(() => {
       setStatus('idle')

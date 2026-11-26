@@ -1,9 +1,10 @@
 import { BeatDetector } from './BeatDetector.ts'
-import { SpectrumProcessor } from './SpectrumProcessor.ts'
+import { ONSET_BAND_COUNT, SpectrumProcessor } from './SpectrumProcessor.ts'
 import type { AudioFrame } from './types.ts'
 
 const FFT_SIZE = 4096
 const MAX_DT_S = 0.1
+const SILENT_BANDS = new Float32Array(ONSET_BAND_COUNT)
 
 export interface AudioInputDevice {
   deviceId: string
@@ -22,6 +23,8 @@ export class AudioEngine {
   private readonly fft = new Float32Array(FFT_SIZE / 2)
   private lastTime = 0
   private startToken = 0
+  /** True once an input was opened; only then are device ids and labels listed (mic permission is granted). */
+  hadInput = false
 
   private readonly frame: AudioFrame = {
     dt: 1 / 60,
@@ -76,32 +79,42 @@ export class AudioEngine {
         autoGainControl: false,
       },
     })
-    if (token !== this.startToken) {
+    const stopStream = () => {
       for (const track of stream.getTracks()) track.stop()
+    }
+    if (token !== this.startToken) {
+      stopStream()
       return
     }
 
-    const ctx = (this.ctx ??= new AudioContext({ latencyHint: 'interactive' }))
-    await ctx.resume()
-    if (token !== this.startToken) {
-      for (const track of stream.getTracks()) track.stop()
-      return
-    }
+    try {
+      const ctx = (this.ctx ??= new AudioContext({ latencyHint: 'interactive' }))
+      await ctx.resume()
+      if (token !== this.startToken) {
+        stopStream()
+        return
+      }
 
-    if (!this.analyser) {
-      const analyser = ctx.createAnalyser()
-      analyser.fftSize = FFT_SIZE
-      analyser.smoothingTimeConstant = 0
-      this.analyser = analyser
-      this.frame.binHz = ctx.sampleRate / FFT_SIZE
-      this.processor = new SpectrumProcessor(this.frame.spectrum, this.frame.binHz)
-    }
+      if (!this.analyser) {
+        const analyser = ctx.createAnalyser()
+        analyser.fftSize = FFT_SIZE
+        analyser.smoothingTimeConstant = 0
+        this.analyser = analyser
+        this.frame.binHz = ctx.sampleRate / FFT_SIZE
+        this.processor = new SpectrumProcessor(this.frame.spectrum, this.frame.binHz)
+      }
 
-    // The analyser is deliberately not connected to ctx.destination: that would
-    // route the input to the speakers and cause feedback with a live microphone.
-    this.source = ctx.createMediaStreamSource(stream)
-    this.source.connect(this.analyser)
-    this.stream = stream
+      // The analyser is deliberately not connected to ctx.destination: that would
+      // route the input to the speakers and cause feedback with a live microphone.
+      this.source = ctx.createMediaStreamSource(stream)
+      this.source.connect(this.analyser)
+      this.stream = stream
+      this.hadInput = true
+    } catch (e) {
+      // Without this the mic would stay open: `release()` only knows streams that finished starting.
+      stopStream()
+      throw e
+    }
     this.lastTime = 0
 
     for (const track of stream.getAudioTracks()) {
@@ -143,6 +156,8 @@ export class AudioEngine {
       frame.treble = processor.treble
     } else {
       frame.spectrum.fill(0)
+      // Keep the detector running so the pulse decays and the tempo resets instead of freezing.
+      this.beat.update(time, dt, SILENT_BANDS)
       frame.level = frame.bass = frame.mid = frame.treble = 0
     }
 

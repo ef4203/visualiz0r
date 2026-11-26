@@ -12,7 +12,7 @@ import {
   saveVisual,
 } from '../settings.ts'
 import { visualizations } from '../visuals/index.ts'
-import type { Size } from '../visuals/types.ts'
+import type { Size, VisualizationInstance } from '../visuals/types.ts'
 
 const HUD_HIDE_MS = 3000
 const MAX_DPR = 2
@@ -38,12 +38,14 @@ function Stage({ engine, onExit }: Props) {
   const [blackout, setBlackout] = useState(false)
   const [brightness, setBrightness] = useState(loadBrightness)
   const [inputLost, setInputLost] = useState(false)
+  const [failedVisual, setFailedVisual] = useState<string | null>(null)
   const [deviceLabel] = useState(() => engine.deviceLabel)
 
   const active = visualizations[index]
 
   const chooseVisual = useCallback((next: (i: number) => number) => {
     visualChosen.current = true
+    setFailedVisual(null)
     setIndex(next)
   }, [])
 
@@ -71,8 +73,7 @@ function Stage({ engine, onExit }: Props) {
     }
   }, [])
 
-  const showHud = useCallback(() => {
-    setHudVisible(true)
+  const scheduleHudHide = useCallback(() => {
     window.clearTimeout(hudTimer.current)
     hudTimer.current = window.setTimeout(() => {
       if (selectOpen.current) return
@@ -80,17 +81,25 @@ function Stage({ engine, onExit }: Props) {
     }, HUD_HIDE_MS)
   }, [])
 
+  const showHud = useCallback(() => {
+    setHudVisible(true)
+    scheduleHudHide()
+  }, [scheduleHudHide])
+
+  // The HUD starts visible; this only arms the timer that hides it.
   useEffect(() => {
-    showHud()
+    scheduleHudHide()
     return () => window.clearTimeout(hudTimer.current)
-  }, [showHud])
+  }, [scheduleHudHide])
 
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d', { alpha: false })
     if (!canvas || !ctx) return
 
-    const instance = active.create()
+    let instance: VisualizationInstance | undefined
+    // Reused between resizes so dragging the window does not allocate a canvas per event.
+    let scratch: HTMLCanvasElement | null = null
     const size: Size = { width: 0, height: 0 }
     const scale = { x: 1, y: 1 }
     const scaler = createRenderScaler()
@@ -101,9 +110,9 @@ function Stage({ engine, onExit }: Props) {
       // Resizing clears the canvas, so carry the old pixels over for visuals that accumulate.
       let old: HTMLCanvasElement | null = null
       if (canvas.width > 0 && canvas.height > 0) {
-        old = document.createElement('canvas')
-        old.width = canvas.width
-        old.height = canvas.height
+        old = scratch ??= document.createElement('canvas')
+        if (old.width !== canvas.width) old.width = canvas.width
+        if (old.height !== canvas.height) old.height = canvas.height
         old.getContext('2d')?.drawImage(canvas, 0, 0)
       }
       canvas.width = Math.max(1, Math.round(size.width * dpr))
@@ -125,7 +134,17 @@ function Stage({ engine, onExit }: Props) {
       if (scaler.update(now) !== null) resize()
       const frame = engine.update(now)
       ctx.setTransform(scale.x, 0, 0, scale.y, 0, 0)
-      instance.draw(ctx, frame, size)
+      try {
+        instance ??= active.create()
+        instance.draw(ctx, frame, size)
+      } catch (e) {
+        // An uncaught throw would end the frame loop and freeze the screen without a word.
+        console.error(e)
+        stopLoop()
+        setFailedVisual(active.name)
+        setHudVisible(true)
+        return
+      }
       // Remember a chosen visual only once it has drawn, so one that throws is never restored.
       if (!drawn) {
         drawn = true
@@ -136,7 +155,7 @@ function Stage({ engine, onExit }: Props) {
     return () => {
       stopLoop()
       observer.disconnect()
-      instance.dispose?.()
+      instance?.dispose?.()
     }
   }, [engine, active])
 
@@ -202,7 +221,7 @@ function Stage({ engine, onExit }: Props) {
 
   useEffect(() => keepScreenAwake(), [])
 
-  const hud = hudVisible || inputLost
+  const hud = hudVisible || inputLost || failedVisual !== null
 
   return (
     <div className={`stage${hud ? '' : ' stage--idle'}`} onMouseMove={showHud}>
@@ -240,6 +259,11 @@ function Stage({ engine, onExit }: Props) {
           </select>
         </div>
         <div className="hud__bottom">
+          {failedVisual && (
+            <p className="hud__alert" role="alert">
+              {failedVisual} failed. Press ← or → to choose another visual.
+            </p>
+          )}
           {inputLost && (
             <p className="hud__alert" role="alert">
               Audio input lost. Press S to choose another input.

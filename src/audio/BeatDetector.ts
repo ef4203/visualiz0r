@@ -191,7 +191,7 @@ export function estimateTempo(
       if (ioi > 4) break
       for (let k = 1; k <= 8; k++) {
         const bpm = (60 * k) / ioi
-        if (bpm < MIN_BPM || bpm >= MAX_BPM) continue
+        if (bpm < MIN_BPM || bpm > MAX_BPM) continue
         const bin = Math.round(bpm - MIN_BPM)
         weight[bin] += recency
         weightedBpm[bin] += recency * bpm

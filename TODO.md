@@ -17,8 +17,6 @@
 
 ## Bugs and gaps
 
-- [ ] **Setup screen after an input loss.** `SetupScreen.tsx` only refreshes the device list `if (engine.active)`. After a loss and `S`, the user gets a lone "Connect audio input" button instead of the device picker, and the "disconnected" message never shows because Stage was mounted when it fired. This contradicts the user guide ("press S and pick it again").
-- [ ] **Tests for the audio core.** `npm test` (Node's built-in runner) smoke-tests every visual, but nothing covers `src/audio/`. Add tests for `estimateTempo` with synthetic click tracks, `bandSpectrum` and `SpectrumProcessor`.
 - [ ] **Developer docs.** `docs/README.md` has no developer section. Document the conventions for visuals: no allocations in `draw`, use `beat.bpm` when known, use the shared palette.
 
 ## Out of scope (to keep the app small)
